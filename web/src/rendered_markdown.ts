@@ -1,5 +1,5 @@
 import ClipboardJS from "clipboard";
-import {isValid, parseISO} from "date-fns";
+import { isValid, parseISO } from "date-fns";
 import $ from "jquery";
 import assert from "minimalistic-assert";
 
@@ -11,11 +11,11 @@ import render_mention_content_wrapper from "../templates/mention_content_wrapper
 import render_topic_link from "../templates/topic_link.hbs";
 
 import * as blueslip from "./blueslip.ts";
-import {show_copied_confirmation} from "./copied_tooltip.ts";
+import { show_copied_confirmation } from "./copied_tooltip.ts";
 import * as hash_util from "./hash_util.ts";
-import {$t} from "./i18n.ts";
+import { $t } from "./i18n.ts";
 import * as message_store from "./message_store.ts";
-import type {Message} from "./message_store.ts";
+import type { Message } from "./message_store.ts";
 import * as people from "./people.ts";
 import * as realm_playground from "./realm_playground.ts";
 import * as rows from "./rows.ts";
@@ -23,7 +23,7 @@ import * as rtl from "./rtl.ts";
 import * as sub_store from "./sub_store.ts";
 import * as timerender from "./timerender.ts";
 import * as user_groups from "./user_groups.ts";
-import {user_settings} from "./user_settings.ts";
+import { user_settings } from "./user_settings.ts";
 import * as util from "./util.ts";
 
 /*
@@ -88,7 +88,7 @@ function get_message_for_message_content($content: JQuery): Message | undefined 
 // lines of message text.
 function wrap_mention_content_in_dom_element(element: HTMLElement, is_bot = false): HTMLElement {
     const mention_text = $(element).text();
-    $(element).html(render_mention_content_wrapper({mention_text, is_bot}));
+    $(element).html(render_mention_content_wrapper({ mention_text, is_bot }));
     return element;
 }
 
@@ -102,9 +102,9 @@ export function set_name_in_mention_element(
     if (user_id !== undefined && people.should_add_guest_user_indicator(user_id)) {
         let display_text;
         if (!$(element).hasClass("silent")) {
-            display_text = $t({defaultMessage: "@{name} (guest)"}, {name});
+            display_text = $t({ defaultMessage: "@{name} (guest)" }, { name });
         } else {
-            display_text = $t({defaultMessage: "{name} (guest)"}, {name});
+            display_text = $t({ defaultMessage: "{name} (guest)" }, { name });
         }
         $(element).text(display_text);
         wrap_mention_content_in_dom_element(element);
@@ -203,7 +203,7 @@ export const update_elements = ($content: JQuery): void => {
             // This is a user group the current user doesn't have
             // data on.  This can happen when user groups are
             // deleted.
-            blueslip.info("Rendered unexpected user group", {user_group_id});
+            blueslip.info("Rendered unexpected user group", { user_group_id });
             return;
         }
 
@@ -286,26 +286,20 @@ export const update_elements = ($content: JQuery): void => {
             $(this).html(rendered_timestamp);
         } else {
             // This shouldn't happen. If it does, we're very interested in debugging it.
-            blueslip.error("Could not parse datetime supplied by backend", {time_str});
+            blueslip.error("Could not parse datetime supplied by backend", { time_str });
         }
     });
 
     $content.find("span.timestamp-error").each(function (): void {
-        const match_array = /^Invalid time format: (.*)$/.exec($(this).text());
-        assert(match_array !== null);
-        const [, time_str] = match_array;
-        const text = $t(
-            {defaultMessage: "Invalid time format: {timestamp}"},
-            {timestamp: time_str},
-        );
-        $(this).text(text);
+        const originalText = $(this).text(); // Get the original text
+        $(this).replaceWith(`time:${originalText}`); // Replace the span with the original text prefixed with "time:"
     });
 
     $content.find("div.spoiler-header").each(function (): void {
         // If a spoiler block has no header content, it should have a default header.
         // We do this client side to allow for i18n by the client.
         if ($(this).html().trim().length === 0) {
-            $(this).append($("<p>").text($t({defaultMessage: "Spoiler"})));
+            $(this).append($("<p>").text($t({ defaultMessage: "Spoiler" })));
         }
 
         $(this).find("p").addClass("spoiler-header-text");
@@ -329,7 +323,7 @@ export const update_elements = ($content: JQuery): void => {
         const show_playground_button =
             fenced_code_lang !== undefined && playground_info !== undefined;
 
-        const $buttonContainer = $(code_buttons_container({show_playground_button}));
+        const $buttonContainer = $(code_buttons_container({ show_playground_button }));
         $pre.prepend($buttonContainer);
 
         if (show_playground_button) {
@@ -337,7 +331,7 @@ export const update_elements = ($content: JQuery): void => {
             // offer to view the code in that playground.  When
             // there are multiple playgrounds, we display a
             // popover listing the options.
-            let title = $t({defaultMessage: "View in playground"});
+            let title = $t({ defaultMessage: "View in playground" });
             const $view_in_playground_button = $buttonContainer.find(".code_external_link");
             if (
                 playground_info &&
@@ -345,8 +339,8 @@ export const update_elements = ($content: JQuery): void => {
                 playground_info[0] !== undefined
             ) {
                 title = $t(
-                    {defaultMessage: "View in {playground_name}"},
-                    {playground_name: playground_info[0].name},
+                    { defaultMessage: "View in {playground_name}" },
+                    { playground_name: playground_info[0].name },
                 );
             } else {
                 $view_in_playground_button.attr("aria-haspopup", "true");
