@@ -574,7 +574,7 @@ function handleLinkifier({
 function handleTimestamp(time_string: string): string {
     let timeobject;
     const time = Number(time_string);
-
+    console.log(time);
     if (Number.isNaN(time)) {
         timeobject = new Date(time_string); // not a Unix timestamp
     } else {
